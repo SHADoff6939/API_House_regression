@@ -9,7 +9,7 @@
       "HalfBath", "BedroomAbvGr", "KitchenAbvGr", "KitchenQual", "TotRmsAbvGrd", "Functional", "Fireplaces", "FireplaceQu",
       "GarageType", "GarageYrBlt", "GarageFinish", "GarageCars", "GarageArea", "GarageQual", "GarageCond", "PavedDrive", 
       "WoodDeckSF", "OpenPorchSF", "EnclosedPorch", "3SsnPorch", "ScreenPorch", "PoolArea", "PoolQC", "Fence", "MiscFeature", 
-      "MiscVal", "MoSold", "YrSold", "SaleType", "SaleCondition", "SalePrice"
+      "MiscVal", "MoSold", "YrSold", "SaleType", "SaleCondition"
     ],
     "final_columns": [
       "MSSubClass", "LotArea", "Street", "LotShape", "LandContour", "Utilities", "LandSlope", "OverallQual", "OverallCond",
