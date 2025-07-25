@@ -1,11 +1,15 @@
 import pandas as pd
+import json
 
 
 class DataLoader(object):
     def fit(self, dataset):
         self.dataset = dataset.copy()
+        with open('settings/specifications.json') as f:
+            specifications = json.load(f)
+        self.final_columns = specifications['description']['final_columns']
 
-    def load_data(self):
+    def load_data(self, is_train=False):
         df = self.dataset
 
         # 1 drop cols
@@ -99,5 +103,19 @@ class DataLoader(object):
 
             df.loc[df[column] < lower_limit, column] = lower_limit
             df.loc[df[column] > upper_limit, column] = upper_limit
+
+        # match columns with final list
+
+        if is_train:
+            self.final_columns = df.columns.tolist()
+        else:
+            # Для predict: якщо колонки відсутні — додаємо їх з нулями
+            for col in self.final_columns:
+                if col not in df.columns:
+                    df[col] = 0
+
+            # Якщо зайві — відкидаємо
+            df = df[self.final_columns]
+
 
         return df
