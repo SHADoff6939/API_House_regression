@@ -9,7 +9,7 @@ class DataLoader(object):
             specifications = json.load(f)
         self.final_columns = specifications['description']['final_columns']
 
-    def load_data(self, is_train=False):
+    def load_data(self):
         df = self.dataset
 
         # 1 drop cols
@@ -69,25 +69,24 @@ class DataLoader(object):
             'PoolArea', 'MiscVal', 'YearBuilt', 'YearRemodAdd'
         ]
 
-        # 7 one-hot encoding for list of columns
-        existing_cols = [col for col in one_code_cols if col in df.columns]
-        df = pd.get_dummies(df, columns=existing_cols, drop_first=True)
-
-        # 8 Label Encoding
+        # 7 encoding for list of columns
         from sklearn.preprocessing import LabelEncoder
 
+        for col in one_code_cols:
+            if col in df.columns:
+                df[col] = LabelEncoder().fit_transform(df[col].astype(str))
+        # 8 Label Encoding
         le = LabelEncoder()
 
         for col in rating_cols:
             df[col] = le.fit_transform(df[col])
 
         # 9 transform data with standart scaling
-        from sklearn.preprocessing import StandardScaler
-
-        std_scaler = StandardScaler()
         for col in cont_cols:
             if col in df.columns:
-                df[col] = std_scaler.fit_transform(df[[col]])
+                col_mean = df[col].mean()
+                col_std = df[col].std()
+                df[col] = (df[col] - col_mean) / col_std
 
         # 10 handle outliers with replacing them with values
         weak_outliers_cols = ['OverallCond', 'LotArea', 'OpenPorchSF', 'MasVnrArea']
@@ -103,19 +102,5 @@ class DataLoader(object):
 
             df.loc[df[column] < lower_limit, column] = lower_limit
             df.loc[df[column] > upper_limit, column] = upper_limit
-
-        # match columns with final list
-
-        if is_train:
-            self.final_columns = df.columns.tolist()
-        else:
-            # Для predict: якщо колонки відсутні — додаємо їх з нулями
-            for col in self.final_columns:
-                if col not in df.columns:
-                    df[col] = 0
-
-            # Якщо зайві — відкидаємо
-            df = df[self.final_columns]
-
 
         return df
